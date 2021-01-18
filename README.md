@@ -36,7 +36,7 @@ For practicing JavaScripting.
 
 </br>
 
-![javascript coding quiz screenshot](./assets/images/screenshot.gif)
+![javascript coding quiz screenshot](./assets/images/screenshot.jpg)
 
 ***
 
