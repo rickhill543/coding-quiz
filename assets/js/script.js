@@ -5,7 +5,7 @@
 // Store scores into an array of objects
 
 
-
+// global variables
 var headerEl = document.getElementById('header');
 var mainEl = document.getElementById('main');
 var highscoreStorage = document.getElementById('highscore')
@@ -13,7 +13,9 @@ var highscoreStorage = document.getElementById('highscore')
 var timeLeft = 0;
 var currentQ = 0;
 
+// landing function that removes looped elements, creates new elements and handles the quiz starting button
 function welcome(backButtonEl, clearButtonEl, newScoreEl) {
+    // removes previous stages elements
     if (backButtonEl) {
         backButtonEl.remove();
     }
@@ -29,6 +31,10 @@ function welcome(backButtonEl, clearButtonEl, newScoreEl) {
     if (newScoreEl) {
         newScoreEl.remove();
     }
+    if (highscoreStorage) {
+        highscoreStorage.classList.add("display-none");
+    }
+    // creates new elements
     var highScoreEl = document.createElement('div');
     highScoreEl.textContent = "View highscores";
     highScoreEl.className = "high-score";
@@ -53,6 +59,7 @@ function welcome(backButtonEl, clearButtonEl, newScoreEl) {
     startButtonEl.textContent = "Start!";
     startButtonEl.className = "start-button";
 
+    // places new elements
     headerEl.appendChild(highScoreEl);
     headerEl.appendChild(timerEl);
     mainEl.insertBefore(titleEl, mainEl.firstChild);
@@ -60,26 +67,28 @@ function welcome(backButtonEl, clearButtonEl, newScoreEl) {
     mainEl.appendChild(startContainerEl);
     startContainerEl.appendChild(startButtonEl);
 
+    // click events triggering either the quiz or highscore data
     startButtonEl.addEventListener("click", function() {
         quiz(highScoreEl, titleEl, instructionsEl, startButtonEl);
     });
     highScoreEl.addEventListener("click", function() {
         highScore(highScoreEl, timerEl, titleEl, instructionsEl, startButtonEl);
     });
-    //return(highScoreEl, titleEl, instructionsEl, startButtonEl);
 }
 
+// quiz function
 function quiz(highScoreEl, titleEl, instructionsEl, startButtonEl) {
-
-    //titleEl.className = "title-question quiz";
+    // removes old elements
     titleEl.classList.remove("welcome");
     instructionsEl.remove();
     startButtonEl.remove();
 
+    // local function variables
     timeLeft = 75;
     currentQ = 0;
     timerEl = document.querySelector(".timer");
     timerEl.textContent = "Time: " + timeLeft;
+    // quiz qestion object array
     var questionArray = [
         {
             "question": "Commonly used data types DO NOT include:",
@@ -128,6 +137,7 @@ function quiz(highScoreEl, titleEl, instructionsEl, startButtonEl) {
         }
         ];
 
+        // quiz button element creation
         var buttonContainerEl = document.createElement('div');
         buttonContainerEl.id = "button-container";
         var buttonOneEl = document.createElement('button');
@@ -148,14 +158,12 @@ function quiz(highScoreEl, titleEl, instructionsEl, startButtonEl) {
         buttonContainerEl.appendChild(buttonFourEl);
         buttonContainerEl.appendChild(responseEl);
 
-
+        // quiz timer function
         quizTimer = setInterval( function() {
-        
             if (timeLeft >= 1) {
                 timeLeft--
                 timerEl.textContent = "Time: " + timeLeft;
             } else {
-                //timeLeft--
                 clearInterval(quizTimer);
                 end(highScoreEl, titleEl, buttonOneEl, buttonTwoEl, buttonThreeEl, buttonFourEl, responseEl);
                 return;
@@ -163,7 +171,7 @@ function quiz(highScoreEl, titleEl, instructionsEl, startButtonEl) {
         console.log(timeLeft);
     }, 1000)
 
-
+        // quiz question cycling function
         function Questions(titleEl, instructionsEl, startButtonEl, questionArray, end) {
             console.log("currentQ: " + currentQ);
             if (currentQ < questionArray.length) {
@@ -176,9 +184,10 @@ function quiz(highScoreEl, titleEl, instructionsEl, startButtonEl) {
                 end(highScoreEl, titleEl, buttonOneEl, buttonTwoEl, buttonThreeEl, buttonFourEl, responseEl);
             }
         }
+
         Questions(titleEl, instructionsEl, startButtonEl, questionArray, end);
 
-
+            // quiz button logic that calls the Question function until there are no more question left and stores the validity of the users ansers
             buttonOneEl.addEventListener("click", function() {
                 var a = "A";
                 console.log("new currentQ " + currentQ);
@@ -255,25 +264,31 @@ function quiz(highScoreEl, titleEl, instructionsEl, startButtonEl) {
                         Questions(titleEl, instructionsEl, startButtonEl, questionArray, end);
                     }
             })
-    console.log("end of quiz function")
-    //highScoreEl.addEventListener("click", highScore);
-
-    //highScoreEl.addEventListener("click", function() {
-    //    highScore(titleEl);
-    //});
-
 }
-// end of quiz functiom
 
-function highStore() {
-    //alert("click works");
-    }
-
-function end(highScoreEl, titleEl, buttonOneEl, buttonTwoEl, buttonThreeEl, buttonFourEl, responseEl, instructionsEl, startButtonEl) {
-    console.log("time left in end function " + timeLeft);
+// the funtion that runs when the timer reaches 0 or there are no more questions left
+function end(highScoreEl, titleEl, buttonOneEl, buttonTwoEl, buttonThreeEl, buttonFourEl, responseEl, instructionsEl, startButtonEl, idCount) {
     clearInterval(quizTimer);
 
-    //titleEl.classList.remove("quiz");
+    var stor = localStorage.getItem("hsArray");
+    console.log("stor " + stor);
+
+    // if the highscore array has information use that array else use blank array
+    if (stor) {
+        highscoreArray = JSON.parse(stor);
+        console.log("arrray used storage " + stor);
+    } else {
+        highscoreArray = [];
+        console.log("arrray used new " + stor);
+    }
+
+
+
+    // id counter that gets stored locally
+    idCount = highscoreArray.length + 1;
+    console.log("IDcount " + idCount);
+
+    // old element cleanup
     buttonOneEl.remove();
     buttonTwoEl.remove();
     buttonThreeEl.remove();
@@ -283,6 +298,7 @@ function end(highScoreEl, titleEl, buttonOneEl, buttonTwoEl, buttonThreeEl, butt
     timerEl.textContent = "Time: " + timeLeft;
     titleEl.textContent = "All Done!";
 
+    // element creation for the ending step of the quiz
     var scoreEl = document.createElement('p');
     scoreEl.textContent = "Your final score was " + timeLeft;
     scoreEl.className = "final-score";
@@ -300,42 +316,43 @@ function end(highScoreEl, titleEl, buttonOneEl, buttonTwoEl, buttonThreeEl, butt
     submitButtonEl.setAttribute("type", "submit")
     submitButtonEl.className ="submit-child submit-button";
 
-
     mainEl.appendChild(scoreEl);
     mainEl.appendChild(submitContainerEl);
     submitContainerEl.appendChild(submitTextEl);
     submitContainerEl.appendChild(submitInputEl);
     submitContainerEl.appendChild(submitButtonEl);
-/*
-    var saveScores = function() {
-        var input = document.getElementById("highscore");
-        localStorage.setItem("tasks", JSON.stringify(tasks));
-    }
-*/
-/*    submitButtonEl.addEventListener("click", function () {
-        var input = document.getElementById("save-data").value;
-        tempScore = timeLeft;
-        timeLeft = 0;
-        localStorage.setItem("server", input);
-        highScore(highScoreEl, timerEl, titleEl, instructionsEl, startButtonEl);
-        console.log("input = " + input);
-    });
-*/
+
+    // click event that grabs the users initials and score and pushes them into the highscore array and stores them locally... it also calls the highscore display function
     submitButtonEl.addEventListener("click", function () {
+        inputField = document.getElementById("save-data").value;
         score = timeLeft;
+        console.log("IDcount " + idCount);
+        userInfo = {
+            uesrId: idCount,
+            userScore: score,
+            userInitials: inputField
+        };
+        highscoreArray.push(userInfo);
         timeLeft = 0;
-        // do a storage thing here
+
         newScoreEl = document.createElement("li");
-        newScoreEl.textContent = score;
-        console.log("score value" + score);
+        newScoreEl.textContent = userInfo.userInitials + ": " + score;
+
+        localStorage.setItem("user", JSON.stringify(userInfo));
         localStorage.setItem("Highscore", score);
+        localStorage.setItem("idCount", idCount);
+        localStorage.setItem("hsArray", JSON.stringify(highscoreArray))
+        inputField.value = " ";
+
         highScore(highScoreEl, timerEl, titleEl, instructionsEl, startButtonEl, submitContainerEl, scoreEl, newScoreEl, score);
     });
     highScoreEl.addEventListener("click", highScore);
 }
 
+// highscore display function
 function highScore(highScoreEl, timerEl, titleEl, instructionsEl, startButtonEl, submitContainerEl, scoreEl, newScoreEl, score) {
     console.log("just now timeleft: " + timeLeft)
+    // old element cleanup
     if (instructionsEl) {
         instructionsEl.remove();
     }
@@ -348,21 +365,20 @@ function highScore(highScoreEl, timerEl, titleEl, instructionsEl, startButtonEl,
     if (submitContainerEl) {
         submitContainerEl.className = "display-none";
     }
-    if (newScoreEl) {
-        highscoreStorage.insertBefore(newScoreEl, highscoreStorage.firstChild);
+    if (highscoreStorage) {
+        highscoreStorage.classList.remove("display-none");
     }
-    /*if (score){
-        var x = document.createElement("li");
-        var y = localStorage.getItem("Highscore")
-        x.textContent = y;
-        highscoreStorage.insertBefore(x, highscoreStorage.firstChild);
-    }*/
-
+    if (newScoreEl) {
+        newEntryEl = document.createElement("li");
+        newEntryEl.className = "new-entry display-block";
+        newEntryEl.textContent = userInfo.userInitials + ": " + score;
+        highscoreStorage.insertBefore(newEntryEl, highscoreStorage.firstChild);
+    }
+    // if ending quiz criteria are met, create elements and assign information
     if (timeLeft == 0) {
         highScoreEl.className = "high-score display-none";
         timerEl.className = "timer display-none";
         titleEl.textContent = "High Scores";
-
 
         var backButtonEl = document.createElement('button');
         backButtonEl.textContent = "Go Back";
@@ -378,18 +394,17 @@ function highScore(highScoreEl, timerEl, titleEl, instructionsEl, startButtonEl,
         return(alert("you must complete the quiz first! And this is not a pause button!"));
     }
 
+    // click event that removes old elements and takes the user back to the welcome screen
     backButtonEl.addEventListener("click", function () {
         titleEl.remove();
         timerEl.remove();
         highScoreEl.remove();
         welcome(backButtonEl, clearButtonEl, newScoreEl);
     })
-    //titleEl.textContent = "High Scores";
-    //console.log(titleEl.textContent);
+    // clears the highscore list
+    clearButtonEl.addEventListener("click", function () {
+        document.querySelectorAll('.new-entry').forEach(li => li.remove());
+    })
 }
 
 welcome();
-
-//highScoreEl.addEventListener("click", highScore);
-
-console.log("end of functions reaaa")
