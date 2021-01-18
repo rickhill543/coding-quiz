@@ -342,6 +342,7 @@ function end(highScoreEl, titleEl, buttonOneEl, buttonTwoEl, buttonThreeEl, butt
         localStorage.setItem("Highscore", score);
         localStorage.setItem("idCount", idCount);
         localStorage.setItem("hsArray", JSON.stringify(highscoreArray))
+        // for some reason, I cannot get additional entries to store different player initials... it always repeats the first name despite my attempt directly below
         inputField.value = " ";
 
         highScore(highScoreEl, timerEl, titleEl, instructionsEl, startButtonEl, submitContainerEl, scoreEl, newScoreEl, score);
